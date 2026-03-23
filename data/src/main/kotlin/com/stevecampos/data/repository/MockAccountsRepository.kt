@@ -42,11 +42,6 @@ class MockAccountsRepository @Inject constructor(
             return unauthorizedResult
         }
 
-        val behavior = debugScenarioRepository.scenarios.value[DebugOperation.GET_MOVEMENTS]
-        if (behavior == MockBehavior.ERROR) {
-            return Result.failure(IllegalStateException("No se pudieron obtener los movimientos"))
-        }
-
         val movements = MockBankingData.movementsByAccount[accountId]
             ?: return Result.failure(NoSuchElementException("Movimientos no encontrados"))
 
