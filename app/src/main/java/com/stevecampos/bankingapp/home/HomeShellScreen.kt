@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -46,10 +47,10 @@ fun HomeShellScreen(
     selectedSection: HomeSection,
     onSectionSelected: (HomeSection) -> Unit,
     productsContent: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
     operationsContent: @Composable () -> Unit = {
         OperationsPlaceholderScreen()
     },
-    modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -60,6 +61,13 @@ fun HomeShellScreen(
                 NavigationBarItem(
                     selected = selectedSection == HomeSection.PRODUCTOS,
                     onClick = { onSectionSelected(HomeSection.PRODUCTOS) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
+                        unselectedTextColor = MaterialTheme.colorScheme.secondary,
+                    ),
                     icon = {
                         Icon(
                             imageVector = Icons.Filled.Home,
@@ -71,6 +79,13 @@ fun HomeShellScreen(
                 NavigationBarItem(
                     selected = selectedSection == HomeSection.OPERACIONES,
                     onClick = { onSectionSelected(HomeSection.OPERACIONES) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
+                        unselectedTextColor = MaterialTheme.colorScheme.secondary,
+                    ),
                     icon = {
                         Icon(
                             imageVector = Icons.Filled.Build,
