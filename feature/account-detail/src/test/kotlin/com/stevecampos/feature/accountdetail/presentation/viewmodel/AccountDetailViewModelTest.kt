@@ -3,27 +3,21 @@ package com.stevecampos.feature.accountdetail.presentation.viewmodel
 import app.cash.turbine.test
 import com.stevecampos.domain.model.Account
 import com.stevecampos.domain.model.AuthSession
-import com.stevecampos.domain.model.DebugOperation
 import com.stevecampos.domain.model.DomainException
-import com.stevecampos.domain.model.MockBehavior
 import com.stevecampos.domain.model.Movement
 import com.stevecampos.domain.model.MovementType
 import com.stevecampos.domain.model.SessionState
 import com.stevecampos.domain.repository.AccountsRepository
-import com.stevecampos.domain.repository.DebugScenarioRepository
 import com.stevecampos.domain.repository.SessionRepository
 import com.stevecampos.domain.usecase.GetAccountMovementsUseCase
 import com.stevecampos.domain.usecase.GetAccountUseCase
 import com.stevecampos.domain.usecase.LogoutUseCase
-import com.stevecampos.domain.usecase.ObserveDebugScenariosUseCase
-import com.stevecampos.domain.usecase.UpdateDebugScenarioUseCase
+import com.stevecampos.feature.accountdetail.R
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailContentState
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailEffect
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailIntent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
@@ -42,20 +36,16 @@ class AccountDetailViewModelTest {
 
     private lateinit var accountsRepository: FakeAccountsRepository
     private lateinit var sessionRepository: FakeSessionRepository
-    private lateinit var debugScenarioRepository: FakeDebugScenarioRepository
     private lateinit var sut: AccountDetailViewModel
 
     @Before
     fun setup() {
         accountsRepository = FakeAccountsRepository()
         sessionRepository = FakeSessionRepository()
-        debugScenarioRepository = FakeDebugScenarioRepository()
         sut = AccountDetailViewModel(
             getAccountUseCase = GetAccountUseCase(accountsRepository),
             getAccountMovementsUseCase = GetAccountMovementsUseCase(accountsRepository),
             logoutUseCase = LogoutUseCase(sessionRepository),
-            observeDebugScenariosUseCase = ObserveDebugScenariosUseCase(debugScenarioRepository),
-            updateDebugScenarioUseCase = UpdateDebugScenarioUseCase(debugScenarioRepository),
             ioDispatcher = mainDispatcherRule.dispatcher,
         )
     }
@@ -94,7 +84,7 @@ class AccountDetailViewModelTest {
 
         // Assert
         val contentState = sut.state.value.contentState as AccountDetailContentState.Error
-        assertEquals("No se pudieron obtener los movimientos", contentState.message)
+        assertEquals(R.string.account_detail_error_movements, contentState.messageRes)
     }
 
     @Test
@@ -145,8 +135,9 @@ class AccountDetailViewModelTest {
         sut.effect.test {
             sut.onIntent(AccountDetailIntent.OnShareAccountDetailsClicked)
             val effect = awaitItem() as AccountDetailEffect.ShareAccountDetails
-            assertTrue(effect.text.contains("Cuenta Sueldo"))
-            assertTrue(effect.text.contains("001-12345678-90"))
+            assertEquals("Cuenta Sueldo", effect.accountName)
+            assertEquals("001-12345678-90", effect.accountNumber)
+            assertTrue(effect.formattedBalance.startsWith("S/"))
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -162,18 +153,18 @@ class AccountDetailViewModelTest {
     private fun sampleMovements() = listOf(
         Movement(
             id = "m001",
-            title = "Abono de nomina",
-            description = "Deposito recibido",
-            amount = 3500.00,
-            date = "23 Mar 2026",
+            title = "Transferencia",
+            description = "",
+            amount = 6.10,
+            date = "Hoy",
             type = MovementType.CREDIT,
         ),
         Movement(
             id = "m002",
-            title = "Pago de servicio",
-            description = "Internet hogar",
-            amount = 149.90,
-            date = "22 Mar 2026",
+            title = "Plin",
+            description = "",
+            amount = 10.00,
+            date = "13 Mar 2026",
             type = MovementType.DEBIT,
         ),
     )
@@ -221,20 +212,5 @@ class AccountDetailViewModelTest {
         override suspend fun getSessionState(): SessionState = SessionState(session = session)
 
         override suspend fun getActiveSession(): AuthSession = session
-    }
-
-    private class FakeDebugScenarioRepository : DebugScenarioRepository {
-        private val mutableScenarios = MutableStateFlow(
-            DebugOperation.entries.associateWith { MockBehavior.SUCCESS },
-        )
-
-        override val scenarios: StateFlow<Map<DebugOperation, MockBehavior>> = mutableScenarios
-
-        override suspend fun updateBehavior(
-            operation: DebugOperation,
-            behavior: MockBehavior,
-        ) {
-            mutableScenarios.value = mutableScenarios.value + (operation to behavior)
-        }
     }
 }

@@ -8,6 +8,7 @@ import com.stevecampos.core.ui.theme.BankingAppTheme
 import com.stevecampos.domain.model.Account
 import com.stevecampos.domain.model.Movement
 import com.stevecampos.domain.model.MovementType
+import com.stevecampos.feature.accountdetail.R
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailContentState
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailState
 import kotlinx.coroutines.flow.emptyFlow
@@ -48,6 +49,10 @@ class AccountDetailScreenTest {
         composeRule.onNodeWithText("Cuenta Sueldo").fetchSemanticsNode()
         composeRule.onNodeWithText("Movimientos").fetchSemanticsNode()
         composeRule.onNodeWithTag("movement_m001").fetchSemanticsNode()
+        composeRule.onNodeWithText("Transferencia").fetchSemanticsNode()
+        composeRule.onNodeWithText("S/ + 6.10").fetchSemanticsNode()
+        composeRule.onNodeWithText("Plin").fetchSemanticsNode()
+        composeRule.onNodeWithText("S/ - 10.00").fetchSemanticsNode()
         composeRule.onNodeWithTag("copy_account_button").fetchSemanticsNode()
     }
 
@@ -57,7 +62,7 @@ class AccountDetailScreenTest {
         setAccountDetailContent(
             state = AccountDetailState(
                 contentState = AccountDetailContentState.Error(
-                    "No se pudieron obtener los movimientos",
+                    R.string.account_detail_error_movements,
                 ),
             ),
         )
@@ -96,18 +101,18 @@ class AccountDetailScreenTest {
     private fun sampleMovements() = listOf(
         Movement(
             id = "m001",
-            title = "Abono de nomina",
-            description = "Deposito recibido",
-            amount = 3500.00,
-            date = "23 Mar 2026",
+            title = "Transferencia",
+            description = "",
+            amount = 6.10,
+            date = "Hoy",
             type = MovementType.CREDIT,
         ),
         Movement(
             id = "m002",
-            title = "Pago de servicio",
-            description = "Internet hogar",
-            amount = 149.90,
-            date = "22 Mar 2026",
+            title = "Plin",
+            description = "",
+            amount = 10.00,
+            date = "13 Mar 2026",
             type = MovementType.DEBIT,
         ),
     )

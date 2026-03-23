@@ -20,7 +20,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.stevecampos.bankingapp.R
 import com.stevecampos.feature.accounts.presentation.contract.AccountsEffect
 import com.stevecampos.feature.accounts.presentation.navigation.AccountsRoute
 
@@ -61,10 +63,10 @@ fun HomeShellScreen(
                     icon = {
                         Icon(
                             imageVector = Icons.Filled.Home,
-                            contentDescription = "Productos",
+                            contentDescription = stringResource(R.string.home_products),
                         )
                     },
-                    label = { Text("Productos") },
+                    label = { Text(stringResource(R.string.home_products)) },
                 )
                 NavigationBarItem(
                     selected = selectedSection == HomeSection.OPERACIONES,
@@ -72,10 +74,10 @@ fun HomeShellScreen(
                     icon = {
                         Icon(
                             imageVector = Icons.Filled.Build,
-                            contentDescription = "Operaciones",
+                            contentDescription = stringResource(R.string.home_operations),
                         )
                     },
-                    label = { Text("Operaciones") },
+                    label = { Text(stringResource(R.string.home_operations)) },
                 )
             }
         },
@@ -104,7 +106,7 @@ private fun OperationsPlaceholderScreen(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = "Operaciones estará disponible en una próxima iteración.",
+            text = stringResource(R.string.home_operations_placeholder),
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(horizontal = 24.dp),
         )

@@ -1,0 +1,10 @@
+<resources>
+    <string name="login_subtitle">Ingresa para continuar.</string>
+    <string name="login_username_label">Usuario</string>
+    <string name="login_password_label">Contraseña</string>
+    <string name="login_hide_password">Ocultar contraseña</string>
+    <string name="login_show_password">Mostrar contraseña</string>
+    <string name="login_submit">Ingresar</string>
+    <string name="login_loading">Validando credenciales...</string>
+    <string name="login_error_invalid_credentials">Usuario y/o contraseña incorrectos</string>
+</resources>

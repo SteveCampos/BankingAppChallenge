@@ -1,0 +1,14 @@
+<resources>
+    <string name="account_detail_loading">Obteniendo detalle de cuenta...</string>
+    <string name="account_detail_movements_title">Movimientos</string>
+    <string name="account_detail_account_number">Cuenta %1$s</string>
+    <string name="account_detail_copy_account">Copiar número de cuenta</string>
+    <string name="account_detail_share_detail">Compartir detalle</string>
+    <string name="account_detail_error_title">No se pudo cargar el detalle</string>
+    <string name="account_detail_retry">Reintentar</string>
+    <string name="account_detail_error_movements">No se pudieron obtener los movimientos</string>
+    <string name="account_detail_share_chooser_title">Compartir detalle de cuenta</string>
+    <string name="account_detail_label_account">Cuenta %1$s</string>
+    <string name="account_detail_label_balance">Saldo %1$s</string>
+    <string name="account_detail_share_message">%1$s\n%2$s\n%3$s</string>
+</resources>

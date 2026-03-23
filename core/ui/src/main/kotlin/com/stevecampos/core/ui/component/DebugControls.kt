@@ -40,6 +40,8 @@ fun DebugControlsCard(
 fun DebugBehaviorRow(
     label: String,
     selectedValue: String,
+    successText: String,
+    errorText: String,
     onSuccessSelected: () -> Unit,
     onErrorSelected: () -> Unit,
     modifier: Modifier = Modifier,
@@ -55,9 +57,9 @@ fun DebugBehaviorRow(
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             AssistChip(
                 onClick = onSuccessSelected,
-                label = { Text("Success") },
+                label = { Text(successText) },
                 colors = AssistChipDefaults.assistChipColors(
-                    containerColor = if (selectedValue == "Success") {
+                    containerColor = if (selectedValue == successText) {
                         MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
                     } else {
                         MaterialTheme.colorScheme.surface
@@ -66,9 +68,9 @@ fun DebugBehaviorRow(
             )
             AssistChip(
                 onClick = onErrorSelected,
-                label = { Text("Error") },
+                label = { Text(errorText) },
                 colors = AssistChipDefaults.assistChipColors(
-                    containerColor = if (selectedValue == "Error") {
+                    containerColor = if (selectedValue == errorText) {
                         MaterialTheme.colorScheme.error.copy(alpha = 0.12f)
                     } else {
                         MaterialTheme.colorScheme.surface

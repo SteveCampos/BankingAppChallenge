@@ -1,0 +1,21 @@
+<resources>
+    <string name="accounts_loading_refresh">Actualizando productos...</string>
+    <string name="accounts_loading_initial">Obteniendo productos...</string>
+    <string name="accounts_debug_title">Debug mocks</string>
+    <string name="accounts_debug_get_accounts">Obtener cuentas</string>
+    <string name="accounts_debug_refresh_accounts">Actualizar cuentas</string>
+    <string name="accounts_debug_behavior_success">Success</string>
+    <string name="accounts_debug_behavior_error">Error</string>
+    <string name="accounts_title">Productos</string>
+    <string name="accounts_greeting">Hola, %1$s</string>
+    <string name="accounts_subtitle">Consulta tus cuentas disponibles.</string>
+    <string name="accounts_account_number">Cuenta %1$s</string>
+    <string name="accounts_unavailable_title">No disponible</string>
+    <string name="accounts_dialog_error_title">Error</string>
+    <string name="accounts_dialog_load_message">Ha ocurrido un error, vuelve a intentarlo.</string>
+    <string name="accounts_dialog_retry">Reintentar</string>
+    <string name="accounts_dialog_refresh_title">Vuelve a intentarlo</string>
+    <string name="accounts_dialog_accept">Aceptar</string>
+    <string name="accounts_error_load_item">No se pudo obtener las cuentas</string>
+    <string name="accounts_error_refresh_item">No se han podido cargar las cuentas, inténtelo de nuevo.</string>
+</resources>

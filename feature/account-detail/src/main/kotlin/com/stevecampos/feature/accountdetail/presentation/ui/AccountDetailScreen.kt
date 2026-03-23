@@ -15,20 +15,19 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.stevecampos.core.ui.component.DebugBehaviorRow
-import com.stevecampos.core.ui.component.DebugControlsCard
 import com.stevecampos.core.ui.component.FullscreenLoading
 import com.stevecampos.core.ui.theme.BankingAppTheme
 import com.stevecampos.core.ui.util.formatCurrency
 import com.stevecampos.domain.model.Account
-import com.stevecampos.domain.model.MockBehavior
 import com.stevecampos.domain.model.Movement
 import com.stevecampos.domain.model.MovementType
+import com.stevecampos.feature.accountdetail.R
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailContentState
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailEffect
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailIntent
@@ -43,7 +42,7 @@ fun AccountDetailScreen(
     onIntent: (AccountDetailIntent) -> Unit,
     onNavigation: (AccountDetailEffect.Navigation) -> Unit,
     onCopyAccountNumber: (String) -> Unit,
-    onShareAccountDetails: (String) -> Unit,
+    onShareAccountDetails: (AccountDetailEffect.ShareAccountDetails) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LaunchedEffect(effect) {
@@ -55,7 +54,7 @@ fun AccountDetailScreen(
 
                 is AccountDetailEffect.Navigation -> onNavigation(emittedEffect)
                 is AccountDetailEffect.ShareAccountDetails -> {
-                    onShareAccountDetails(emittedEffect.text)
+                    onShareAccountDetails(emittedEffect)
                 }
             }
         }
@@ -75,7 +74,7 @@ fun AccountDetailScreen(
         if (state.contentState is AccountDetailContentState.Loading) {
             FullscreenLoading(
                 modifier = Modifier.testTag("account_detail_loading"),
-                message = "Obteniendo detalle de cuenta...",
+                message = stringResource(R.string.account_detail_loading),
             )
         }
     }
@@ -111,7 +110,7 @@ private fun AccountDetailContent(
 
                 item {
                     Text(
-                        text = "Movimientos",
+                        text = stringResource(R.string.account_detail_movements_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
                     )
@@ -132,7 +131,7 @@ private fun AccountDetailContent(
             is AccountDetailContentState.Error -> {
                 item {
                     AccountDetailError(
-                        message = contentState.message,
+                        message = stringResource(contentState.messageRes),
                         onRetryClick = {
                             onIntent(AccountDetailIntent.OnRetryClicked)
                         },
@@ -141,23 +140,6 @@ private fun AccountDetailContent(
             }
         }
 
-        item {
-            DebugControlsCard(
-                title = "Debug mocks",
-                modifier = Modifier.testTag("account_detail_debug_controls"),
-            ) {
-                DebugBehaviorRow(
-                    label = "Obtener movimientos",
-                    selectedValue = state.getMovementsBehavior.label,
-                    onSuccessSelected = {
-                        onIntent(AccountDetailIntent.OnGetMovementsBehaviorChanged(MockBehavior.SUCCESS))
-                    },
-                    onErrorSelected = {
-                        onIntent(AccountDetailIntent.OnGetMovementsBehaviorChanged(MockBehavior.ERROR))
-                    },
-                )
-            }
-        }
     }
 }
 
@@ -186,7 +168,7 @@ private fun AccountSummaryCard(
                 color = MaterialTheme.colorScheme.primary,
             )
             Text(
-                text = "Cuenta ${account.accountNumber}",
+                text = stringResource(R.string.account_detail_account_number, account.accountNumber),
                 style = MaterialTheme.typography.bodyLarge,
             )
             Column(
@@ -198,7 +180,7 @@ private fun AccountSummaryCard(
                         .fillMaxWidth()
                         .testTag("copy_account_button"),
                 ) {
-                    Text("Copiar número de cuenta")
+                    Text(stringResource(R.string.account_detail_copy_account))
                 }
                 Button(
                     onClick = onShareClick,
@@ -206,7 +188,7 @@ private fun AccountSummaryCard(
                         .fillMaxWidth()
                         .testTag("share_account_button"),
                 ) {
-                    Text("Compartir detalle")
+                    Text(stringResource(R.string.account_detail_share_detail))
                 }
             }
         }
@@ -229,11 +211,13 @@ private fun MovementRow(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
-            Text(
-                text = movement.description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            if (movement.description.isNotBlank()) {
+                Text(
+                    text = movement.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             Text(
                 text = movement.date,
                 style = MaterialTheme.typography.labelMedium,
@@ -271,7 +255,7 @@ private fun AccountDetailError(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
-                text = "No se pudo cargar el detalle",
+                text = stringResource(R.string.account_detail_error_title),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.error,
             )
@@ -283,7 +267,7 @@ private fun AccountDetailError(
                 onClick = onRetryClick,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Reintentar")
+                Text(stringResource(R.string.account_detail_retry))
             }
         }
     }
@@ -294,10 +278,12 @@ private fun movementAmount(
     currency: String,
 ): String {
     val prefix = if (movement.type == MovementType.CREDIT) "+" else "-"
-    return prefix + formatCurrency(
+    val formattedAmount = formatCurrency(
         amount = movement.amount,
         currency = currency,
     )
+    val numericAmount = formattedAmount.removePrefix("$currency ")
+    return "$currency $prefix $numericAmount"
 }
 
 @Preview(showBackground = true)
@@ -317,10 +303,10 @@ private fun AccountDetailScreenPreview() {
                     movements = listOf(
                         Movement(
                             id = "m001",
-                            title = "Abono de nomina",
-                            description = "Deposito recibido",
-                            amount = 3500.00,
-                            date = "23 Mar 2026",
+                            title = "Transferencia",
+                            description = "",
+                            amount = 6.10,
+                            date = "Hoy",
                             type = MovementType.CREDIT,
                         ),
                     ),

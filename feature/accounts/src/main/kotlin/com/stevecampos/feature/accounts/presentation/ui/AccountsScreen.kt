@@ -17,6 +17,7 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +31,7 @@ import com.stevecampos.core.ui.theme.BankingAppTheme
 import com.stevecampos.core.ui.util.formatCurrency
 import com.stevecampos.domain.model.Account
 import com.stevecampos.domain.model.MockBehavior
+import com.stevecampos.feature.accounts.R
 import com.stevecampos.feature.accounts.presentation.contract.AccountsDialogAction
 import com.stevecampos.feature.accounts.presentation.contract.AccountsContentState
 import com.stevecampos.feature.accounts.presentation.contract.AccountsDialogState
@@ -84,9 +86,9 @@ fun AccountsScreen(
             FullscreenLoading(
                 modifier = Modifier.testTag("accounts_loading"),
                 message = if (state.isRefreshing) {
-                    "Actualizando productos..."
+                    stringResource(R.string.accounts_loading_refresh)
                 } else {
-                    "Obteniendo productos..."
+                    stringResource(R.string.accounts_loading_initial)
                 },
             )
         }
@@ -94,9 +96,9 @@ fun AccountsScreen(
 
     state.dialog?.let { dialogState ->
         AppMessageDialog(
-            title = dialogState.title,
-            message = dialogState.message,
-            confirmText = dialogState.confirmText,
+            title = stringResource(dialogState.titleRes),
+            message = stringResource(dialogState.messageRes),
+            confirmText = stringResource(dialogState.confirmTextRes),
             onConfirm = { onIntent(AccountsIntent.OnDialogConfirmClicked) },
             onDismiss = { onIntent(AccountsIntent.OnDialogDismissed) },
         )
@@ -129,12 +131,14 @@ private fun AccountsContent(
 
             item {
                 DebugControlsCard(
-                    title = "Debug mocks",
+                    title = stringResource(R.string.accounts_debug_title),
                     modifier = Modifier.testTag("accounts_debug_controls"),
                 ) {
                     DebugBehaviorRow(
-                        label = "Obtener cuentas",
-                        selectedValue = state.getAccountsBehavior.label,
+                        label = stringResource(R.string.accounts_debug_get_accounts),
+                        selectedValue = mockBehaviorLabel(state.getAccountsBehavior),
+                        successText = stringResource(R.string.accounts_debug_behavior_success),
+                        errorText = stringResource(R.string.accounts_debug_behavior_error),
                         onSuccessSelected = {
                             onIntent(AccountsIntent.OnGetAccountsBehaviorChanged(MockBehavior.SUCCESS))
                         },
@@ -143,8 +147,10 @@ private fun AccountsContent(
                         },
                     )
                     DebugBehaviorRow(
-                        label = "Actualizar cuentas",
-                        selectedValue = state.refreshAccountsBehavior.label,
+                        label = stringResource(R.string.accounts_debug_refresh_accounts),
+                        selectedValue = mockBehaviorLabel(state.refreshAccountsBehavior),
+                        successText = stringResource(R.string.accounts_debug_behavior_success),
+                        errorText = stringResource(R.string.accounts_debug_behavior_error),
                         onSuccessSelected = {
                             onIntent(AccountsIntent.OnRefreshAccountsBehaviorChanged(MockBehavior.SUCCESS))
                         },
@@ -164,13 +170,13 @@ private fun androidx.compose.foundation.lazy.LazyListScope.accountsHeader(userNa
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = "Productos",
+                text = stringResource(R.string.accounts_title),
                 style = MaterialTheme.typography.headlineMedium,
             )
             Text(
                 text = userName?.let { greetingName ->
-                    "Hola, $greetingName"
-                } ?: "Consulta tus cuentas disponibles.",
+                    stringResource(R.string.accounts_greeting, greetingName)
+                } ?: stringResource(R.string.accounts_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -202,7 +208,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.accountsContentByStat
         is AccountsContentState.Error -> {
             item {
                 AccountsErrorItem(
-                    message = contentState.message,
+                    message = stringResource(contentState.messageRes),
                     modifier = Modifier.testTag("accounts_error"),
                 )
             }
@@ -239,7 +245,7 @@ private fun AccountCard(
                 color = MaterialTheme.colorScheme.primary,
             )
             Text(
-                text = "Cuenta ${account.accountNumber}",
+                text = stringResource(R.string.accounts_account_number, account.accountNumber),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -260,7 +266,7 @@ private fun AccountsErrorItem(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = "No disponible",
+                text = stringResource(R.string.accounts_unavailable_title),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.error,
             )
@@ -291,9 +297,9 @@ private fun AccountsScreenPreview() {
                     ),
                 ),
                 dialog = AccountsDialogState(
-                    title = "Error",
-                    message = "Ha ocurrido un error, vuelve a intentarlo.",
-                    confirmText = "Reintentar",
+                    titleRes = R.string.accounts_dialog_error_title,
+                    messageRes = R.string.accounts_dialog_load_message,
+                    confirmTextRes = R.string.accounts_dialog_retry,
                     action = AccountsDialogAction.RETRY_INITIAL_LOAD,
                 ),
                 userName = "userTest1",
@@ -303,4 +309,10 @@ private fun AccountsScreenPreview() {
             onNavigation = {},
         )
     }
+}
+
+@Composable
+private fun mockBehaviorLabel(behavior: MockBehavior): String = when (behavior) {
+    MockBehavior.SUCCESS -> stringResource(R.string.accounts_debug_behavior_success)
+    MockBehavior.ERROR -> stringResource(R.string.accounts_debug_behavior_error)
 }

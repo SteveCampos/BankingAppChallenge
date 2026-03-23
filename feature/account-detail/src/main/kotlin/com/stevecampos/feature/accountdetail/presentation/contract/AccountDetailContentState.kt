@@ -1,5 +1,6 @@
 package com.stevecampos.feature.accountdetail.presentation.contract
 
+import androidx.annotation.StringRes
 import com.stevecampos.domain.model.Account
 import com.stevecampos.domain.model.Movement
 
@@ -10,5 +11,5 @@ sealed interface AccountDetailContentState {
         val account: Account,
         val movements: List<Movement>,
     ) : AccountDetailContentState
-    data class Error(val message: String) : AccountDetailContentState
+    data class Error(@StringRes val messageRes: Int) : AccountDetailContentState
 }

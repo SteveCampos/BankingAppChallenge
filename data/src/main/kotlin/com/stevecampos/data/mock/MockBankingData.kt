@@ -3,6 +3,9 @@ package com.stevecampos.data.mock
 import com.stevecampos.domain.model.Account
 import com.stevecampos.domain.model.Movement
 import com.stevecampos.domain.model.MovementType
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 object MockBankingData {
     val validUsers: Map<String, String> = mapOf(
@@ -35,21 +38,37 @@ object MockBankingData {
         ),
     )
 
-    val movementsByAccount: Map<String, List<Movement>> = mapOf(
-        "001" to listOf(
-            Movement("m001", "Abono de nomina", "Deposito recibido", 3500.00, "23 Mar 2026", MovementType.CREDIT),
-            Movement("m002", "Pago de servicio", "Internet hogar", 149.90, "22 Mar 2026", MovementType.DEBIT),
-            Movement("m003", "Transferencia enviada", "A cuenta de Juan Perez", 420.00, "21 Mar 2026", MovementType.DEBIT),
-            Movement("m004", "Compra con tarjeta", "Supermercado", 286.35, "20 Mar 2026", MovementType.DEBIT),
+    val movementsByAccount: Map<String, List<Movement>> = accounts.associate { account ->
+        account.id to defaultMovements()
+    }
+
+    private fun defaultMovements(): List<Movement> = listOf(
+        Movement(
+            id = "m001",
+            title = "Transferencia",
+            description = "",
+            amount = 6.10,
+            date = "Hoy",
+            type = MovementType.CREDIT,
         ),
-        "002" to listOf(
-            Movement("m005", "Interes ganado", "Rendimiento mensual", 18.40, "23 Mar 2026", MovementType.CREDIT),
-            Movement("m006", "Deposito", "Transferencia recibida", 800.00, "19 Mar 2026", MovementType.CREDIT),
-            Movement("m007", "Retiro", "Cajero automatico", 200.00, "18 Mar 2026", MovementType.DEBIT),
-        ),
-        "003" to listOf(
-            Movement("m008", "Compra internacional", "Suscripcion software", 12.99, "21 Mar 2026", MovementType.DEBIT),
-            Movement("m009", "Transferencia recibida", "Pago freelance", 150.00, "18 Mar 2026", MovementType.CREDIT),
+        Movement(
+            id = "m002",
+            title = "Plin",
+            description = "",
+            amount = 10.00,
+            date = formatDate(daysAgo = 10),
+            type = MovementType.DEBIT,
         ),
     )
+
+    private fun formatDate(daysAgo: Int): String {
+        val locale = Locale.forLanguageTag("es-PE")
+        val calendar = Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_YEAR, -daysAgo)
+        }
+        val formatter = SimpleDateFormat("dd MMM yyyy", locale)
+        return formatter.format(calendar.time).replaceFirstChar { char ->
+            char.uppercase()
+        }
+    }
 }

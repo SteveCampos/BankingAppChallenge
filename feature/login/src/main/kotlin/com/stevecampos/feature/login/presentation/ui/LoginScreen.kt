@@ -33,11 +33,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.stevecampos.core.ui.component.DebugBehaviorRow
-import com.stevecampos.core.ui.component.DebugControlsCard
+import androidx.compose.ui.res.stringResource
 import com.stevecampos.core.ui.component.FullscreenLoading
 import com.stevecampos.core.ui.theme.BankingAppTheme
-import com.stevecampos.domain.model.MockBehavior
+import com.stevecampos.feature.login.R
 import com.stevecampos.feature.login.presentation.contract.LoginEffect
 import com.stevecampos.feature.login.presentation.contract.LoginIntent
 import com.stevecampos.feature.login.presentation.contract.LoginState
@@ -50,8 +49,8 @@ fun LoginScreen(
     effect: Flow<LoginEffect>,
     onIntent: (LoginIntent) -> Unit,
     onNavigation: (LoginEffect.Navigation) -> Unit,
-    appName: String? = null,
     modifier: Modifier = Modifier,
+    appName: String? = null,
 ) {
     val context = LocalContext.current
     val resolvedAppName = appName ?: remember(context) {
@@ -82,7 +81,7 @@ fun LoginScreen(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Ingresa para continuar.",
+                text = stringResource(R.string.login_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -93,7 +92,7 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("login_username"),
-                label = { Text("Usuario") },
+                label = { Text(stringResource(R.string.login_username_label)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -107,7 +106,7 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("login_password"),
-                label = { Text("Contraseña") },
+                label = { Text(stringResource(R.string.login_password_label)) },
                 singleLine = true,
                 visualTransformation = if (state.isPasswordVisible) {
                     VisualTransformation.None
@@ -129,18 +128,18 @@ fun LoginScreen(
                                 Icons.Filled.Visibility
                             },
                             contentDescription = if (state.isPasswordVisible) {
-                                "Ocultar contraseña"
+                                stringResource(R.string.login_hide_password)
                             } else {
-                                "Mostrar contraseña"
+                                stringResource(R.string.login_show_password)
                             },
                         )
                     }
                 },
             )
-            if (state.errorMessage != null) {
+            if (state.errorMessageRes != null) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = state.errorMessage,
+                    text = stringResource(state.errorMessageRes),
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colorScheme.error,
                     textAlign = TextAlign.Center,
@@ -154,29 +153,16 @@ fun LoginScreen(
                     .testTag("login_button"),
                 enabled = state.isLoginEnabled,
             ) {
-                Text("Ingresar")
+                Text(stringResource(R.string.login_submit))
             }
 
             // Reservado para volver a mostrar referencias de usuarios mock si el challenge lo requiere.
             // Spacer(modifier = Modifier.height(24.dp))
             // MockUsersReference()
-            Spacer(modifier = Modifier.height(24.dp))
-            DebugControlsCard(title = "Debug mocks") {
-                DebugBehaviorRow(
-                    label = "Login",
-                    selectedValue = state.debugLoginBehavior.label,
-                    onSuccessSelected = {
-                        onIntent(LoginIntent.OnDebugBehaviorChanged(MockBehavior.SUCCESS))
-                    },
-                    onErrorSelected = {
-                        onIntent(LoginIntent.OnDebugBehaviorChanged(MockBehavior.ERROR))
-                    },
-                )
-            }
         }
 
         if (state.isLoading) {
-            FullscreenLoading(message = "Validando credenciales...")
+            FullscreenLoading(message = stringResource(R.string.login_loading))
         }
     }
 }

@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.stevecampos.core.ui.theme.BankingAppTheme
 import com.stevecampos.domain.model.Account
+import com.stevecampos.feature.accounts.R
 import com.stevecampos.feature.accounts.presentation.contract.AccountsContentState
 import com.stevecampos.feature.accounts.presentation.contract.AccountsDialogAction
 import com.stevecampos.feature.accounts.presentation.contract.AccountsDialogState
@@ -38,7 +39,7 @@ class AccountsScreenTest {
         // Arrange
         setAccountsContent(
             state = AccountsState(
-                contentState = AccountsContentState.Error("No se pudo obtener las cuentas"),
+                contentState = AccountsContentState.Error(R.string.accounts_error_load_item),
             ),
         )
 
@@ -53,9 +54,9 @@ class AccountsScreenTest {
         setAccountsContent(
             state = AccountsState(
                 dialog = AccountsDialogState(
-                    title = "Error",
-                    message = "Ha ocurrido un error, vuelve a intentarlo.",
-                    confirmText = "Reintentar",
+                    titleRes = R.string.accounts_dialog_error_title,
+                    messageRes = R.string.accounts_dialog_load_message,
+                    confirmTextRes = R.string.accounts_dialog_retry,
                     action = AccountsDialogAction.RETRY_INITIAL_LOAD,
                 ),
             ),

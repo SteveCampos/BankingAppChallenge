@@ -12,6 +12,7 @@ import com.stevecampos.domain.usecase.LogoutUseCase
 import com.stevecampos.domain.usecase.ObserveDebugScenariosUseCase
 import com.stevecampos.domain.usecase.RefreshAccountsUseCase
 import com.stevecampos.domain.usecase.UpdateDebugScenarioUseCase
+import com.stevecampos.feature.accounts.R
 import com.stevecampos.feature.accounts.presentation.contract.AccountsDialogAction
 import com.stevecampos.feature.accounts.presentation.contract.AccountsContentState
 import com.stevecampos.feature.accounts.presentation.contract.AccountsDialogState
@@ -166,11 +167,11 @@ class AccountsViewModel @Inject constructor(
         updateState {
             copy(
                 isRefreshing = false,
-                contentState = AccountsContentState.Error(INITIAL_LOAD_ITEM_MESSAGE),
+                contentState = AccountsContentState.Error(R.string.accounts_error_load_item),
                 dialog = AccountsDialogState(
-                    title = DEFAULT_DIALOG_TITLE,
-                    message = INITIAL_LOAD_DIALOG_MESSAGE,
-                    confirmText = INITIAL_LOAD_CONFIRM_TEXT,
+                    titleRes = R.string.accounts_dialog_error_title,
+                    messageRes = R.string.accounts_dialog_load_message,
+                    confirmTextRes = R.string.accounts_dialog_retry,
                     action = AccountsDialogAction.RETRY_INITIAL_LOAD,
                 ),
             )
@@ -186,11 +187,11 @@ class AccountsViewModel @Inject constructor(
         updateState {
             copy(
                 isRefreshing = false,
-                contentState = AccountsContentState.Error(REFRESH_ITEM_MESSAGE),
+                contentState = AccountsContentState.Error(R.string.accounts_error_refresh_item),
                 dialog = AccountsDialogState(
-                    title = REFRESH_DIALOG_TITLE,
-                    message = REFRESH_ITEM_MESSAGE,
-                    confirmText = REFRESH_CONFIRM_TEXT,
+                    titleRes = R.string.accounts_dialog_refresh_title,
+                    messageRes = R.string.accounts_error_refresh_item,
+                    confirmTextRes = R.string.accounts_dialog_accept,
                     action = AccountsDialogAction.DISMISS,
                 ),
             )
@@ -237,13 +238,4 @@ class AccountsViewModel @Inject constructor(
         }
     }
 
-    private companion object {
-        const val DEFAULT_DIALOG_TITLE = "Error"
-        const val INITIAL_LOAD_ITEM_MESSAGE = "No se pudo obtener las cuentas"
-        const val INITIAL_LOAD_DIALOG_MESSAGE = "Ha ocurrido un error, vuelve a intentarlo."
-        const val INITIAL_LOAD_CONFIRM_TEXT = "Reintentar"
-        const val REFRESH_DIALOG_TITLE = "Vuelve a intentarlo"
-        const val REFRESH_ITEM_MESSAGE = "No se han podido cargar las cuentas, inténtelo de nuevo."
-        const val REFRESH_CONFIRM_TEXT = "Aceptar"
-    }
 }
