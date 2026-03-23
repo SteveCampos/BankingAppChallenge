@@ -1,4 +1,4 @@
-    package com.stevecampos.feature.login.presentation.ui
+package com.stevecampos.feature.login.presentation.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,11 +19,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -49,8 +50,14 @@ fun LoginScreen(
     effect: Flow<LoginEffect>,
     onIntent: (LoginIntent) -> Unit,
     onNavigation: (LoginEffect.Navigation) -> Unit,
+    appName: String? = null,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val resolvedAppName = appName ?: remember(context) {
+        context.applicationInfo.loadLabel(context.packageManager).toString()
+    }
+
     LaunchedEffect(effect) {
         effect.collect { emittedEffect ->
             when (emittedEffect) {
@@ -70,12 +77,12 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
-                text = "Banco Móvil",
+                text = resolvedAppName,
                 style = MaterialTheme.typography.headlineMedium,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Ingresa con uno de los usuarios mock del challenge.",
+                text = "Ingresa para continuar.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -149,8 +156,10 @@ fun LoginScreen(
             ) {
                 Text("Ingresar")
             }
-            Spacer(modifier = Modifier.height(24.dp))
-            MockUsersReference()
+
+            // Reservado para volver a mostrar referencias de usuarios mock si el challenge lo requiere.
+            // Spacer(modifier = Modifier.height(24.dp))
+            // MockUsersReference()
             Spacer(modifier = Modifier.height(24.dp))
             DebugControlsCard(title = "Debug mocks") {
                 DebugBehaviorRow(
@@ -172,27 +181,27 @@ fun LoginScreen(
     }
 }
 
-@Composable
-private fun MockUsersReference(modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        tonalElevation = 2.dp,
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text(
-                text = "Usuarios válidos",
-                style = MaterialTheme.typography.titleSmall,
-            )
-            Text("userTest1 / passTest1")
-            Text("User@test / TestPass_")
-            Text("user123& / 123456")
-        }
-    }
-}
+// @Composable
+// private fun MockUsersReference(modifier: Modifier = Modifier) {
+//     Surface(
+//         modifier = modifier.fillMaxWidth(),
+//         shape = MaterialTheme.shapes.medium,
+//         tonalElevation = 2.dp,
+//     ) {
+//         Column(
+//             modifier = Modifier.padding(16.dp),
+//             verticalArrangement = Arrangement.spacedBy(8.dp),
+//         ) {
+//             Text(
+//                 text = "Usuarios válidos",
+//                 style = MaterialTheme.typography.titleSmall,
+//             )
+//             Text("userTest1 / passTest1")
+//             Text("User@test / TestPass_")
+//             Text("user123& / 123456")
+//         }
+//     }
+// }
 
 @Preview(showBackground = true)
 @Composable
@@ -203,6 +212,7 @@ private fun LoginScreenPreview() {
             effect = emptyFlow(),
             onIntent = {},
             onNavigation = {},
+            appName = "Banking App Challenge",
         )
     }
 }

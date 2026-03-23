@@ -1,6 +1,10 @@
 package com.stevecampos.core.ui.util
 
 object EmojiSanitizer {
+    private const val VARIATION_SELECTOR_16 = 0xFE0F
+    private const val ZERO_WIDTH_JOINER = 0x200D
+    private const val COMBINING_ENCLOSING_KEYCAP = 0x20E3
+
     fun removeEmoji(input: String): String {
         val builder = StringBuilder()
         var index = 0
@@ -17,16 +21,17 @@ object EmojiSanitizer {
     }
 
     private fun isEmojiCodePoint(codePoint: Int): Boolean {
-        val block = Character.UnicodeBlock.of(codePoint)
-        return codePoint == 0xFE0F ||
+        return codePoint == VARIATION_SELECTOR_16 ||
+            codePoint == ZERO_WIDTH_JOINER ||
+            codePoint == COMBINING_ENCLOSING_KEYCAP ||
             codePoint in 0x1F1E6..0x1F1FF ||
             codePoint in 0x1F3FB..0x1F3FF ||
-            block == Character.UnicodeBlock.EMOTICONS ||
-            block == Character.UnicodeBlock.MISCELLANEOUS_SYMBOLS_AND_PICTOGRAPHS ||
-            block == Character.UnicodeBlock.TRANSPORT_AND_MAP_SYMBOLS ||
-            block == Character.UnicodeBlock.SUPPLEMENTAL_SYMBOLS_AND_PICTOGRAPHS ||
-            block == Character.UnicodeBlock.SYMBOLS_AND_PICTOGRAPHS_EXTENDED_A ||
-            block == Character.UnicodeBlock.MISCELLANEOUS_SYMBOLS ||
-            block == Character.UnicodeBlock.DINGBATS
+            codePoint in 0x1F300..0x1F5FF ||
+            codePoint in 0x1F600..0x1F64F ||
+            codePoint in 0x1F680..0x1F6FF ||
+            codePoint in 0x1F900..0x1F9FF ||
+            codePoint in 0x1FA70..0x1FAFF ||
+            codePoint in 0x2600..0x26FF ||
+            codePoint in 0x2700..0x27BF
     }
 }

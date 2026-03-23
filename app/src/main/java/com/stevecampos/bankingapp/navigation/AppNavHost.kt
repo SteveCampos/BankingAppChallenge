@@ -4,7 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.stevecampos.bankingapp.home.HomePlaceholderRoute
+import com.stevecampos.feature.accounts.presentation.contract.AccountsEffect
+import com.stevecampos.feature.accounts.presentation.navigation.AccountsRoute
 import com.stevecampos.feature.login.presentation.contract.LoginEffect
 import com.stevecampos.feature.login.presentation.navigation.LoginRoute
 
@@ -34,7 +35,20 @@ fun AppNavHost(
         }
 
         composable<HomeDestination> {
-            HomePlaceholderRoute()
+            AccountsRoute(
+                onNavigation = { navigationEffect ->
+                    when (navigationEffect) {
+                        AccountsEffect.Navigation.GoToLogin -> {
+                            navController.navigate(LoginDestination) {
+                                popUpTo<HomeDestination> {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
+                        }
+                    }
+                },
+            )
         }
     }
 }
