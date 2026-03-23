@@ -2,5 +2,5 @@
     <string name="app_name">Banking App Challenge</string>
     <string name="home_products">Productos</string>
     <string name="home_operations">Operaciones</string>
-    <string name="home_operations_placeholder">Operaciones estará disponible en una próxima iteración.</string>
+    <string name="home_operations_placeholder">Operaciones</string>
 </resources>

@@ -19,12 +19,6 @@ class MockAuthRepository @Inject constructor(
         password: String,
     ): Result<AuthSession> {
         delay(MOCK_DELAY_MS)
-
-        val loginBehavior = debugScenarioRepository.scenarios.value[DebugOperation.LOGIN]
-        if (loginBehavior == MockBehavior.ERROR) {
-            return Result.failure(DomainException.InvalidCredentials)
-        }
-
         val expectedPassword = MockBankingData.validUsers[username]
         return if (expectedPassword == password) {
             Result.success(
