@@ -21,4 +21,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "Banking App Challenge"
 include(":app")
+include(":core:ui")
+include(":domain")
+include(":data")
+include(":feature:login")
+include(":feature:accounts")
+include(":feature:account-detail")
  

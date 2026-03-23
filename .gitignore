@@ -9,7 +9,12 @@
 /.idea/assetWizardSettings.xml
 .DS_Store
 /build
+/app/build
+**/build/
 /captures
 .externalNativeBuild
 .cxx
 local.properties
+.idea/
+.vscode/
+/domain/bin/
