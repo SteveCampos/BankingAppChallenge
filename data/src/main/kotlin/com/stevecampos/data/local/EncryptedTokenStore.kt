@@ -8,6 +8,7 @@ import com.stevecampos.domain.repository.TokenStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.core.content.edit
 
 @Singleton
 class EncryptedTokenStore @Inject constructor(
@@ -25,13 +26,13 @@ class EncryptedTokenStore @Inject constructor(
     )
 
     override suspend fun save(session: AuthSession) {
-        sharedPreferences.edit()
-            .putString(KEY_ACCESS_TOKEN, session.accessToken)
-            .putString(KEY_USERNAME, session.username)
-            .putLong(KEY_ISSUED_AT, session.issuedAtMillis)
-            .putLong(KEY_EXPIRES_AT, session.expiresAtMillis)
-            .putLong(KEY_LAST_ACTIVITY_AT, session.lastActivityAtMillis)
-            .apply()
+        sharedPreferences.edit {
+            putString(KEY_ACCESS_TOKEN, session.accessToken)
+                .putString(KEY_USERNAME, session.username)
+                .putLong(KEY_ISSUED_AT, session.issuedAtMillis)
+                .putLong(KEY_EXPIRES_AT, session.expiresAtMillis)
+                .putLong(KEY_LAST_ACTIVITY_AT, session.lastActivityAtMillis)
+        }
     }
 
     override suspend fun get(): AuthSession? {
@@ -48,7 +49,7 @@ class EncryptedTokenStore @Inject constructor(
     }
 
     override suspend fun clear() {
-        sharedPreferences.edit().clear().apply()
+        sharedPreferences.edit { clear() }
     }
 
     private companion object {

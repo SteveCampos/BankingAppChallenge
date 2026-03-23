@@ -11,4 +11,7 @@ data class AccountsState(
     val getAccountsBehavior: MockBehavior = MockBehavior.SUCCESS,
     val refreshAccountsBehavior: MockBehavior = MockBehavior.SUCCESS,
     val getMovementsBehavior: MockBehavior = MockBehavior.SUCCESS,
-)
+) {
+    val hasAccountsContent: Boolean
+        get() = items.any { item -> item is AccountsItemState.AccountItem }
+}
