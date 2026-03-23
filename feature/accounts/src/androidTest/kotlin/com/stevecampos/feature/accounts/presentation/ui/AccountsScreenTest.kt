@@ -30,6 +30,7 @@ class AccountsScreenTest {
 
         // Assert
         composeRule.onNodeWithTag("accounts_loading").fetchSemanticsNode()
+        composeRule.onNodeWithText("Productos").fetchSemanticsNode()
     }
 
     @Test
@@ -67,7 +68,7 @@ class AccountsScreenTest {
     }
 
     @Test
-    fun givenAccountsContentAndRefreshState_whenScreenIsRendered_thenCardsAndRefreshIndicatorAreVisible() {
+    fun givenAccountsContentAndRefreshState_whenScreenIsRendered_thenCardsAndFullscreenLoadingAreVisible() {
         // Arrange
         setAccountsContent(
             state = AccountsState(
@@ -79,7 +80,7 @@ class AccountsScreenTest {
         )
 
         // Assert
-        composeRule.onNodeWithTag("accounts_refresh_indicator").fetchSemanticsNode()
+        composeRule.onNodeWithTag("accounts_loading").fetchSemanticsNode()
         composeRule.onNodeWithTag("accounts_card_1").fetchSemanticsNode()
         composeRule.onNodeWithText("Cuenta sueldo").fetchSemanticsNode()
     }

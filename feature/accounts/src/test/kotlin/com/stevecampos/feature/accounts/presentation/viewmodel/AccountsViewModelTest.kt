@@ -178,6 +178,19 @@ class AccountsViewModelTest {
         assertEquals(MockBehavior.ERROR, sut.state.value.getAccountsBehavior)
     }
 
+    @Test
+    fun `GIVEN account tap WHEN account is selected THEN detail navigation is emitted`() = runTest {
+        // Arrange + Act + Assert
+        sut.effect.test {
+            sut.onIntent(AccountsIntent.OnAccountClicked("001"))
+            assertEquals(
+                AccountsEffect.Navigation.GoToAccountDetail("001"),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun sampleAccounts() = listOf(
         Account(
             id = "1",

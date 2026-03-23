@@ -4,8 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
+import com.stevecampos.bankingapp.home.HomeShellRoute
 import com.stevecampos.feature.accounts.presentation.contract.AccountsEffect
-import com.stevecampos.feature.accounts.presentation.navigation.AccountsRoute
+import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailEffect
+import com.stevecampos.feature.accountdetail.presentation.navigation.AccountDetailRoute
 import com.stevecampos.feature.login.presentation.contract.LoginEffect
 import com.stevecampos.feature.login.presentation.navigation.LoginRoute
 
@@ -35,10 +38,35 @@ fun AppNavHost(
         }
 
         composable<HomeDestination> {
-            AccountsRoute(
+            HomeShellRoute(
+                onAccountsNavigation = { navigationEffect ->
+                    when (navigationEffect) {
+                        is AccountsEffect.Navigation.GoToAccountDetail -> {
+                            navController.navigate(
+                                AccountDetailDestination(accountId = navigationEffect.accountId),
+                            )
+                        }
+
+                        AccountsEffect.Navigation.GoToLogin -> {
+                            navController.navigate(LoginDestination) {
+                                popUpTo<HomeDestination> {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
+                        }
+                    }
+                },
+            )
+        }
+
+        composable<AccountDetailDestination> { backStackEntry ->
+            val destination = backStackEntry.toRoute<AccountDetailDestination>()
+            AccountDetailRoute(
+                accountId = destination.accountId,
                 onNavigation = { navigationEffect ->
                     when (navigationEffect) {
-                        AccountsEffect.Navigation.GoToLogin -> {
+                        AccountDetailEffect.Navigation.GoToLogin -> {
                             navController.navigate(LoginDestination) {
                                 popUpTo<HomeDestination> {
                                     inclusive = true

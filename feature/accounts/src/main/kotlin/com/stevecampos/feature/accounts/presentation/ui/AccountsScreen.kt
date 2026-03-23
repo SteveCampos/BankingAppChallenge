@@ -3,25 +3,21 @@ package com.stevecampos.feature.accounts.presentation.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Card
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -81,16 +77,17 @@ fun AccountsScreen(
             modifier = Modifier.fillMaxSize(),
         )
 
-        PullRefreshIndicator(
-            refreshing = state.isRefreshing,
-            state = pullRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter),
-        )
-
-        if (state.contentState is AccountsContentState.Loading) {
+        if (
+            state.contentState is AccountsContentState.Loading ||
+            state.isRefreshing
+        ) {
             FullscreenLoading(
                 modifier = Modifier.testTag("accounts_loading"),
-                message = "Obteniendo cuentas...",
+                message = if (state.isRefreshing) {
+                    "Actualizando productos..."
+                } else {
+                    "Obteniendo productos..."
+                },
             )
         }
     }
@@ -115,15 +112,6 @@ private fun AccountsContent(
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
-        if (state.isRefreshing) {
-            LinearProgressIndicator(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("accounts_refresh_indicator"),
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-        }
-
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -132,7 +120,12 @@ private fun AccountsContent(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             accountsHeader(userName = state.userName)
-            accountsContentByState(contentState = state.contentState)
+            accountsContentByState(
+                contentState = state.contentState,
+                onAccountClick = { accountId ->
+                    onIntent(AccountsIntent.OnAccountClicked(accountId))
+                },
+            )
 
             item {
                 DebugControlsCard(
@@ -171,7 +164,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.accountsHeader(userNa
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = "Tus cuentas",
+                text = "Productos",
                 style = MaterialTheme.typography.headlineMedium,
             )
             Text(
@@ -187,6 +180,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.accountsHeader(userNa
 
 private fun androidx.compose.foundation.lazy.LazyListScope.accountsContentByState(
     contentState: AccountsContentState,
+    onAccountClick: (String) -> Unit,
 ) {
     when (contentState) {
         AccountsContentState.Empty,
@@ -199,6 +193,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.accountsContentByStat
             ) { account ->
                 AccountCard(
                     account = account,
+                    onClick = onAccountClick,
                     modifier = Modifier.testTag("accounts_card_${account.id}"),
                 )
             }
@@ -218,10 +213,13 @@ private fun androidx.compose.foundation.lazy.LazyListScope.accountsContentByStat
 @Composable
 private fun AccountCard(
     account: Account,
+    onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick(account.id) },
     ) {
         Column(
             modifier = Modifier.padding(16.dp),

@@ -7,3 +7,6 @@ data object LoginDestination
 
 @Serializable
 data object HomeDestination
+
+@Serializable
+data class AccountDetailDestination(val accountId: String)
