@@ -14,10 +14,10 @@ import com.stevecampos.domain.usecase.ObserveDebugScenariosUseCase
 import com.stevecampos.domain.usecase.RefreshAccountsUseCase
 import com.stevecampos.domain.usecase.UpdateDebugScenarioUseCase
 import com.stevecampos.feature.accounts.presentation.contract.AccountsDialogAction
+import com.stevecampos.feature.accounts.presentation.contract.AccountsContentState
 import com.stevecampos.feature.accounts.presentation.contract.AccountsDialogState
 import com.stevecampos.feature.accounts.presentation.contract.AccountsEffect
 import com.stevecampos.feature.accounts.presentation.contract.AccountsIntent
-import com.stevecampos.feature.accounts.presentation.contract.AccountsItemState
 import com.stevecampos.feature.accounts.presentation.contract.AccountsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -92,15 +92,14 @@ class AccountsViewModel @Inject constructor(
 
     private fun loadAccounts(force: Boolean) {
         val currentState = state.value
-        if (!force && (currentState.isLoading || currentState.items.isNotEmpty())) {
+        if (!force && currentState.contentState !is AccountsContentState.Empty) {
             return
         }
 
         updateState {
             copy(
-                isLoading = true,
                 isRefreshing = false,
-                items = emptyList(),
+                contentState = AccountsContentState.Loading,
                 dialog = null,
             )
         }
@@ -109,8 +108,7 @@ class AccountsViewModel @Inject constructor(
             onSuccess = { accounts ->
                 updateState {
                     copy(
-                        isLoading = false,
-                        items = accounts.mapToItems(),
+                        contentState = AccountsContentState.Content(accounts),
                         dialog = null,
                     )
                 }
@@ -125,7 +123,10 @@ class AccountsViewModel @Inject constructor(
 
     private fun refreshAccounts() {
         val currentState = state.value
-        if (currentState.isLoading || currentState.isRefreshing) {
+        if (
+            currentState.contentState is AccountsContentState.Loading ||
+            currentState.isRefreshing
+        ) {
             return
         }
 
@@ -141,7 +142,7 @@ class AccountsViewModel @Inject constructor(
                 updateState {
                     copy(
                         isRefreshing = false,
-                        items = accounts.mapToItems(),
+                        contentState = AccountsContentState.Content(accounts),
                         dialog = null,
                     )
                 }
@@ -162,11 +163,8 @@ class AccountsViewModel @Inject constructor(
 
         updateState {
             copy(
-                isLoading = false,
                 isRefreshing = false,
-                items = listOf(
-                    AccountsItemState.ErrorItem(INITIAL_LOAD_ITEM_MESSAGE),
-                ),
+                contentState = AccountsContentState.Error(INITIAL_LOAD_ITEM_MESSAGE),
                 dialog = AccountsDialogState(
                     title = DEFAULT_DIALOG_TITLE,
                     message = INITIAL_LOAD_DIALOG_MESSAGE,
@@ -185,11 +183,8 @@ class AccountsViewModel @Inject constructor(
 
         updateState {
             copy(
-                isLoading = false,
                 isRefreshing = false,
-                items = listOf(
-                    AccountsItemState.ErrorItem(REFRESH_ITEM_MESSAGE),
-                ),
+                contentState = AccountsContentState.Error(REFRESH_ITEM_MESSAGE),
                 dialog = AccountsDialogState(
                     title = REFRESH_DIALOG_TITLE,
                     message = REFRESH_ITEM_MESSAGE,
@@ -203,10 +198,9 @@ class AccountsViewModel @Inject constructor(
     private suspend fun handleUnauthorized() {
         updateState {
             copy(
-                isLoading = false,
                 isRefreshing = false,
                 dialog = null,
-                items = emptyList(),
+                contentState = AccountsContentState.Empty,
             )
         }
         logoutUseCase()
@@ -239,10 +233,6 @@ class AccountsViewModel @Inject constructor(
                 behavior = behavior,
             )
         }
-    }
-
-    private fun List<Account>.mapToItems(): List<AccountsItemState> {
-        return map { account -> AccountsItemState.AccountItem(account) }
     }
 
     private companion object {

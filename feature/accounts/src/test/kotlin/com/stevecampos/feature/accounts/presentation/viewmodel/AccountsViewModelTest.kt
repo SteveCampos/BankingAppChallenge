@@ -16,9 +16,9 @@ import com.stevecampos.domain.usecase.LogoutUseCase
 import com.stevecampos.domain.usecase.ObserveDebugScenariosUseCase
 import com.stevecampos.domain.usecase.RefreshAccountsUseCase
 import com.stevecampos.domain.usecase.UpdateDebugScenarioUseCase
+import com.stevecampos.feature.accounts.presentation.contract.AccountsContentState
 import com.stevecampos.feature.accounts.presentation.contract.AccountsEffect
 import com.stevecampos.feature.accounts.presentation.contract.AccountsIntent
-import com.stevecampos.feature.accounts.presentation.contract.AccountsItemState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -73,14 +73,14 @@ class AccountsViewModelTest {
         runCurrent()
 
         // Assert
-        assertTrue(sut.state.value.isLoading)
+        assertTrue(sut.state.value.contentState is AccountsContentState.Loading)
 
         advanceTimeBy(1_000L)
         advanceUntilIdle()
 
-        assertFalse(sut.state.value.isLoading)
-        assertEquals(2, sut.state.value.items.size)
-        assertTrue(sut.state.value.items.first() is AccountsItemState.AccountItem)
+        assertTrue(sut.state.value.contentState is AccountsContentState.Content)
+        val contentState = sut.state.value.contentState as AccountsContentState.Content
+        assertEquals(2, contentState.accounts.size)
         assertNull(sut.state.value.dialog)
     }
 
@@ -94,10 +94,10 @@ class AccountsViewModelTest {
         advanceUntilIdle()
 
         // Assert
-        assertFalse(sut.state.value.isLoading)
+        assertTrue(sut.state.value.contentState is AccountsContentState.Error)
         assertEquals(
             "No se pudo obtener las cuentas",
-            (sut.state.value.items.single() as AccountsItemState.ErrorItem).message,
+            (sut.state.value.contentState as AccountsContentState.Error).message,
         )
         assertEquals("Ha ocurrido un error, vuelve a intentarlo.", sut.state.value.dialog?.message)
         assertEquals("Reintentar", sut.state.value.dialog?.confirmText)
@@ -123,8 +123,8 @@ class AccountsViewModelTest {
         advanceUntilIdle()
 
         assertFalse(sut.state.value.isRefreshing)
-        val firstItem = sut.state.value.items.first() as AccountsItemState.AccountItem
-        assertEquals("Cuenta ahorro", firstItem.account.name)
+        val contentState = sut.state.value.contentState as AccountsContentState.Content
+        assertEquals("Cuenta ahorro", contentState.accounts.first().name)
     }
 
     @Test
@@ -143,7 +143,7 @@ class AccountsViewModelTest {
         assertFalse(sut.state.value.isRefreshing)
         assertEquals(
             "No se han podido cargar las cuentas, inténtelo de nuevo.",
-            (sut.state.value.items.single() as AccountsItemState.ErrorItem).message,
+            (sut.state.value.contentState as AccountsContentState.Error).message,
         )
         assertEquals("Vuelve a intentarlo", sut.state.value.dialog?.title)
         assertEquals("Aceptar", sut.state.value.dialog?.confirmText)

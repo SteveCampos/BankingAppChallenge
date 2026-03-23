@@ -6,9 +6,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.stevecampos.core.ui.theme.BankingAppTheme
 import com.stevecampos.domain.model.Account
+import com.stevecampos.feature.accounts.presentation.contract.AccountsContentState
 import com.stevecampos.feature.accounts.presentation.contract.AccountsDialogAction
 import com.stevecampos.feature.accounts.presentation.contract.AccountsDialogState
-import com.stevecampos.feature.accounts.presentation.contract.AccountsItemState
 import com.stevecampos.feature.accounts.presentation.contract.AccountsState
 import kotlinx.coroutines.flow.emptyFlow
 import org.junit.Rule
@@ -25,7 +25,7 @@ class AccountsScreenTest {
     fun givenLoadingState_whenScreenIsRendered_thenLoadingComposableIsVisible() {
         // Arrange
         setAccountsContent(
-            state = AccountsState(isLoading = true),
+            state = AccountsState(contentState = AccountsContentState.Loading),
         )
 
         // Assert
@@ -33,18 +33,16 @@ class AccountsScreenTest {
     }
 
     @Test
-    fun givenErrorItemState_whenScreenIsRendered_thenErrorComposableIsVisible() {
+    fun givenErrorState_whenScreenIsRendered_thenErrorComposableIsVisible() {
         // Arrange
         setAccountsContent(
             state = AccountsState(
-                items = listOf(
-                    AccountsItemState.ErrorItem("No se pudo obtener las cuentas"),
-                ),
+                contentState = AccountsContentState.Error("No se pudo obtener las cuentas"),
             ),
         )
 
         // Assert
-        composeRule.onNodeWithTag("accounts_error_item_0").fetchSemanticsNode()
+        composeRule.onNodeWithTag("accounts_error").fetchSemanticsNode()
         composeRule.onNodeWithText("No se pudo obtener las cuentas").fetchSemanticsNode()
     }
 
@@ -74,8 +72,8 @@ class AccountsScreenTest {
         setAccountsContent(
             state = AccountsState(
                 isRefreshing = true,
-                items = listOf(
-                    AccountsItemState.AccountItem(sampleAccount()),
+                contentState = AccountsContentState.Content(
+                    listOf(sampleAccount()),
                 ),
             ),
         )

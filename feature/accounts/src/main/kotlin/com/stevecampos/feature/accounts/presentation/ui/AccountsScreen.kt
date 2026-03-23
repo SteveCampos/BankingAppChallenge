@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Card
 import androidx.compose.material3.LinearProgressIndicator
@@ -35,10 +35,10 @@ import com.stevecampos.core.ui.util.formatCurrency
 import com.stevecampos.domain.model.Account
 import com.stevecampos.domain.model.MockBehavior
 import com.stevecampos.feature.accounts.presentation.contract.AccountsDialogAction
+import com.stevecampos.feature.accounts.presentation.contract.AccountsContentState
 import com.stevecampos.feature.accounts.presentation.contract.AccountsDialogState
 import com.stevecampos.feature.accounts.presentation.contract.AccountsEffect
 import com.stevecampos.feature.accounts.presentation.contract.AccountsIntent
-import com.stevecampos.feature.accounts.presentation.contract.AccountsItemState
 import com.stevecampos.feature.accounts.presentation.contract.AccountsState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -87,7 +87,7 @@ fun AccountsScreen(
             modifier = Modifier.align(Alignment.TopCenter),
         )
 
-        if (state.isLoading && !state.hasAccountsContent) {
+        if (state.contentState is AccountsContentState.Loading) {
             FullscreenLoading(
                 modifier = Modifier.testTag("accounts_loading"),
                 message = "Obteniendo cuentas...",
@@ -131,44 +131,8 @@ private fun AccountsContent(
             contentPadding = androidx.compose.foundation.layout.PaddingValues(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            item {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Text(
-                        text = "Tus cuentas",
-                        style = MaterialTheme.typography.headlineMedium,
-                    )
-                    Text(
-                        text = state.userName?.let { userName ->
-                            "Hola, $userName"
-                        } ?: "Consulta tus cuentas disponibles.",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-
-            itemsIndexed(
-                items = state.items,
-                key = { index, item -> "${item::class.simpleName}-$index" },
-            ) { index, item ->
-                when (item) {
-                    is AccountsItemState.AccountItem -> {
-                        AccountCard(
-                            account = item.account,
-                            modifier = Modifier.testTag("accounts_card_${item.account.id}"),
-                        )
-                    }
-
-                    is AccountsItemState.ErrorItem -> {
-                        AccountsErrorItem(
-                            message = item.message,
-                            modifier = Modifier.testTag("accounts_error_item_$index"),
-                        )
-                    }
-                }
-            }
+            accountsHeader(userName = state.userName)
+            accountsContentByState(contentState = state.contentState)
 
             item {
                 DebugControlsCard(
@@ -196,6 +160,56 @@ private fun AccountsContent(
                         },
                     )
                 }
+            }
+        }
+    }
+}
+
+private fun androidx.compose.foundation.lazy.LazyListScope.accountsHeader(userName: String?) {
+    item {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(
+                text = "Tus cuentas",
+                style = MaterialTheme.typography.headlineMedium,
+            )
+            Text(
+                text = userName?.let { greetingName ->
+                    "Hola, $greetingName"
+                } ?: "Consulta tus cuentas disponibles.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+private fun androidx.compose.foundation.lazy.LazyListScope.accountsContentByState(
+    contentState: AccountsContentState,
+) {
+    when (contentState) {
+        AccountsContentState.Empty,
+        AccountsContentState.Loading -> Unit
+
+        is AccountsContentState.Content -> {
+            items(
+                items = contentState.accounts,
+                key = { account -> account.id },
+            ) { account ->
+                AccountCard(
+                    account = account,
+                    modifier = Modifier.testTag("accounts_card_${account.id}"),
+                )
+            }
+        }
+
+        is AccountsContentState.Error -> {
+            item {
+                AccountsErrorItem(
+                    message = contentState.message,
+                    modifier = Modifier.testTag("accounts_error"),
+                )
             }
         }
     }
@@ -267,8 +281,8 @@ private fun AccountsScreenPreview() {
     BankingAppTheme {
         AccountsScreen(
             state = AccountsState(
-                items = listOf(
-                    AccountsItemState.AccountItem(
+                contentState = AccountsContentState.Content(
+                    listOf(
                         Account(
                             id = "1",
                             name = "Cuenta sueldo",
