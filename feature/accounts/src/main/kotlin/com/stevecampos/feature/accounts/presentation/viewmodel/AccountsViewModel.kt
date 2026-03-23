@@ -3,7 +3,6 @@ package com.stevecampos.feature.accounts.presentation.viewmodel
 import androidx.lifecycle.viewModelScope
 import com.stevecampos.core.ui.mvi.MviViewModel
 import com.stevecampos.domain.coroutines.IoDispatcher
-import com.stevecampos.domain.model.Account
 import com.stevecampos.domain.model.DebugOperation
 import com.stevecampos.domain.model.DomainException
 import com.stevecampos.domain.model.MockBehavior
@@ -45,6 +44,9 @@ class AccountsViewModel @Inject constructor(
 
     override fun onIntent(intent: AccountsIntent) {
         when (intent) {
+            is AccountsIntent.OnAccountClicked -> emitEffect(
+                AccountsEffect.Navigation.GoToAccountDetail(intent.accountId),
+            )
             AccountsIntent.OnDialogConfirmClicked -> handleDialogConfirm()
             AccountsIntent.OnDialogDismissed -> dismissDialog()
             AccountsIntent.OnRefreshRequested -> refreshAccounts()

@@ -8,6 +8,7 @@ sealed interface AccountsIntent {
     data object OnRetryInitialLoadClicked : AccountsIntent
     data object OnDialogDismissed : AccountsIntent
     data object OnDialogConfirmClicked : AccountsIntent
+    data class OnAccountClicked(val accountId: String) : AccountsIntent
     data class OnGetAccountsBehaviorChanged(val behavior: MockBehavior) : AccountsIntent
     data class OnRefreshAccountsBehaviorChanged(val behavior: MockBehavior) : AccountsIntent
 }
