@@ -5,43 +5,40 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.stevecampos.bankingapp.ui.theme.BankingAppChallengeTheme
+import androidx.navigation.compose.rememberNavController
+import com.stevecampos.bankingapp.navigation.AppNavHost
+import com.stevecampos.core.ui.theme.BankingAppTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            BankingAppChallengeTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+            BankingAppRoot()
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+private fun BankingAppRoot() {
+    BankingAppTheme {
+        Surface(modifier = Modifier.fillMaxSize()) {
+            val navController = rememberNavController()
+            AppNavHost(navController = navController)
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    BankingAppChallengeTheme {
-        Greeting("Android")
+private fun BankingAppRootPreview() {
+    BankingAppTheme {
+        Surface(modifier = Modifier.fillMaxSize()) {}
     }
 }
