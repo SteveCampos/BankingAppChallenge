@@ -16,6 +16,7 @@ import com.stevecampos.domain.usecase.LogoutUseCase
 import com.stevecampos.domain.usecase.ObserveDebugScenariosUseCase
 import com.stevecampos.domain.usecase.RefreshAccountsUseCase
 import com.stevecampos.domain.usecase.UpdateDebugScenarioUseCase
+import com.stevecampos.feature.accounts.R
 import com.stevecampos.feature.accounts.presentation.contract.AccountsContentState
 import com.stevecampos.feature.accounts.presentation.contract.AccountsEffect
 import com.stevecampos.feature.accounts.presentation.contract.AccountsIntent
@@ -96,11 +97,11 @@ class AccountsViewModelTest {
         // Assert
         assertTrue(sut.state.value.contentState is AccountsContentState.Error)
         assertEquals(
-            "No se pudo obtener las cuentas",
-            (sut.state.value.contentState as AccountsContentState.Error).message,
+            R.string.accounts_error_load_item,
+            (sut.state.value.contentState as AccountsContentState.Error).messageRes,
         )
-        assertEquals("Ha ocurrido un error, vuelve a intentarlo.", sut.state.value.dialog?.message)
-        assertEquals("Reintentar", sut.state.value.dialog?.confirmText)
+        assertEquals(R.string.accounts_dialog_load_message, sut.state.value.dialog?.messageRes)
+        assertEquals(R.string.accounts_dialog_retry, sut.state.value.dialog?.confirmTextRes)
     }
 
     @Test
@@ -142,11 +143,11 @@ class AccountsViewModelTest {
         // Assert
         assertFalse(sut.state.value.isRefreshing)
         assertEquals(
-            "No se han podido cargar las cuentas, inténtelo de nuevo.",
-            (sut.state.value.contentState as AccountsContentState.Error).message,
+            R.string.accounts_error_refresh_item,
+            (sut.state.value.contentState as AccountsContentState.Error).messageRes,
         )
-        assertEquals("Vuelve a intentarlo", sut.state.value.dialog?.title)
-        assertEquals("Aceptar", sut.state.value.dialog?.confirmText)
+        assertEquals(R.string.accounts_dialog_refresh_title, sut.state.value.dialog?.titleRes)
+        assertEquals(R.string.accounts_dialog_accept, sut.state.value.dialog?.confirmTextRes)
     }
 
     @Test

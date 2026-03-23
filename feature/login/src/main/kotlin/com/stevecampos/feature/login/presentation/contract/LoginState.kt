@@ -1,11 +1,13 @@
 package com.stevecampos.feature.login.presentation.contract
 
+import androidx.annotation.StringRes
+
 data class LoginState(
     val username: String = DEFAULT_USERNAME,
     val password: String = DEFAULT_PASSWORD,
     val isPasswordVisible: Boolean = false,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null,
+    @StringRes val errorMessageRes: Int? = null,
 ) {
     val isLoginEnabled: Boolean
         get() = username.isNotBlank() && password.isNotBlank() && !isLoading

@@ -7,6 +7,7 @@ import com.stevecampos.domain.model.DomainException
 import com.stevecampos.domain.usecase.GetAccountMovementsUseCase
 import com.stevecampos.domain.usecase.GetAccountUseCase
 import com.stevecampos.domain.usecase.LogoutUseCase
+import com.stevecampos.feature.accountdetail.R
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailContentState
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailEffect
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailIntent
@@ -77,7 +78,7 @@ class AccountDetailViewModel @Inject constructor(
         updateState {
             copy(
                 contentState = AccountDetailContentState.Error(
-                    throwable.message ?: DEFAULT_ERROR_MESSAGE,
+                    R.string.account_detail_error_movements,
                 ),
             )
         }
@@ -93,16 +94,10 @@ class AccountDetailViewModel @Inject constructor(
         val account = contentState.account
         emitEffect(
             AccountDetailEffect.ShareAccountDetails(
-                text = buildString {
-                    appendLine(account.name)
-                    appendLine("Cuenta ${account.accountNumber}")
-                    append("Saldo ${formatCurrency(account.balance, account.currency)}")
-                },
+                accountName = account.name,
+                accountNumber = account.accountNumber,
+                formattedBalance = formatCurrency(account.balance, account.currency),
             ),
         )
-    }
-
-    private companion object {
-        const val DEFAULT_ERROR_MESSAGE = "No se pudieron obtener los movimientos"
     }
 }

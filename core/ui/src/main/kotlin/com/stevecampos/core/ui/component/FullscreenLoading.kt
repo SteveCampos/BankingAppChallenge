@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun FullscreenLoading(
     modifier: Modifier = Modifier,
-    message: String = "Cargando...",
+    message: String,
 ) {
     Box(
         modifier = modifier

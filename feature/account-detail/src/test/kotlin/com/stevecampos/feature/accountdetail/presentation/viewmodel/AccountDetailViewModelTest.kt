@@ -12,6 +12,7 @@ import com.stevecampos.domain.repository.SessionRepository
 import com.stevecampos.domain.usecase.GetAccountMovementsUseCase
 import com.stevecampos.domain.usecase.GetAccountUseCase
 import com.stevecampos.domain.usecase.LogoutUseCase
+import com.stevecampos.feature.accountdetail.R
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailContentState
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailEffect
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailIntent
@@ -83,7 +84,7 @@ class AccountDetailViewModelTest {
 
         // Assert
         val contentState = sut.state.value.contentState as AccountDetailContentState.Error
-        assertEquals("No se pudieron obtener los movimientos", contentState.message)
+        assertEquals(R.string.account_detail_error_movements, contentState.messageRes)
     }
 
     @Test
@@ -134,8 +135,9 @@ class AccountDetailViewModelTest {
         sut.effect.test {
             sut.onIntent(AccountDetailIntent.OnShareAccountDetailsClicked)
             val effect = awaitItem() as AccountDetailEffect.ShareAccountDetails
-            assertTrue(effect.text.contains("Cuenta Sueldo"))
-            assertTrue(effect.text.contains("001-12345678-90"))
+            assertEquals("Cuenta Sueldo", effect.accountName)
+            assertEquals("001-12345678-90", effect.accountNumber)
+            assertTrue(effect.formattedBalance.startsWith("S/"))
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -7,6 +7,7 @@ import com.stevecampos.domain.model.SessionState
 import com.stevecampos.domain.repository.AuthRepository
 import com.stevecampos.domain.repository.SessionRepository
 import com.stevecampos.domain.usecase.LoginUseCase
+import com.stevecampos.feature.login.R
 import com.stevecampos.feature.login.presentation.contract.LoginEffect
 import com.stevecampos.feature.login.presentation.contract.LoginIntent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -120,7 +121,7 @@ class LoginViewModelTest {
             advanceUntilIdle()
 
             assertFalse(sut.state.value.isLoading)
-            assertEquals("Usuario y/o contraseña incorrectos", sut.state.value.errorMessage)
+            assertEquals(R.string.login_error_invalid_credentials, sut.state.value.errorMessageRes)
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }

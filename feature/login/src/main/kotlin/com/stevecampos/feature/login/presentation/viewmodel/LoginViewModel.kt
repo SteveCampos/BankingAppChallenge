@@ -5,6 +5,7 @@ import com.stevecampos.core.ui.util.EmojiSanitizer
 import com.stevecampos.domain.coroutines.IoDispatcher
 import com.stevecampos.domain.model.DomainException
 import com.stevecampos.domain.usecase.LoginUseCase
+import com.stevecampos.feature.login.R
 import com.stevecampos.feature.login.presentation.contract.LoginEffect
 import com.stevecampos.feature.login.presentation.contract.LoginIntent
 import com.stevecampos.feature.login.presentation.contract.LoginState
@@ -34,7 +35,7 @@ class LoginViewModel @Inject constructor(
         updateState {
             copy(
                 username = EmojiSanitizer.removeEmoji(value),
-                errorMessage = null,
+                errorMessageRes = null,
             )
         }
     }
@@ -43,7 +44,7 @@ class LoginViewModel @Inject constructor(
         updateState {
             copy(
                 password = EmojiSanitizer.removeEmoji(value),
-                errorMessage = null,
+                errorMessageRes = null,
             )
         }
     }
@@ -63,7 +64,7 @@ class LoginViewModel @Inject constructor(
         updateState {
             copy(
                 isLoading = true,
-                errorMessage = null,
+                errorMessageRes = null,
             )
         }
 
@@ -76,9 +77,9 @@ class LoginViewModel @Inject constructor(
                 updateState {
                     copy(
                         isLoading = false,
-                        errorMessage = when (throwable) {
-                            DomainException.InvalidCredentials -> INVALID_CREDENTIALS_MESSAGE
-                            else -> throwable.message ?: INVALID_CREDENTIALS_MESSAGE
+                        errorMessageRes = when (throwable) {
+                            DomainException.InvalidCredentials -> R.string.login_error_invalid_credentials
+                            else -> R.string.login_error_invalid_credentials
                         },
                     )
                 }
@@ -91,7 +92,4 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private companion object {
-        const val INVALID_CREDENTIALS_MESSAGE = "Usuario y/o contraseña incorrectos"
-    }
 }

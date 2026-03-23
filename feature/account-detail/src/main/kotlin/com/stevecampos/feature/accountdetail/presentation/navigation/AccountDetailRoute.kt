@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.stevecampos.feature.accountdetail.R
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailEffect
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailIntent
 import com.stevecampos.feature.accountdetail.presentation.ui.AccountDetailScreen
@@ -36,13 +37,30 @@ fun AccountDetailRoute(
         onCopyAccountNumber = { accountNumber ->
             clipboardManager.setText(AnnotatedString(accountNumber))
         },
-        onShareAccountDetails = { text ->
+        onShareAccountDetails = { shareData ->
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, text)
+                putExtra(
+                    Intent.EXTRA_TEXT,
+                    context.getString(
+                        R.string.account_detail_share_message,
+                        shareData.accountName,
+                        context.getString(
+                            R.string.account_detail_label_account,
+                            shareData.accountNumber,
+                        ),
+                        context.getString(
+                            R.string.account_detail_label_balance,
+                            shareData.formattedBalance,
+                        ),
+                    ),
+                )
             }
             context.startActivity(
-                Intent.createChooser(shareIntent, "Compartir detalle de cuenta"),
+                Intent.createChooser(
+                    shareIntent,
+                    context.getString(R.string.account_detail_share_chooser_title),
+                ),
             )
         },
     )

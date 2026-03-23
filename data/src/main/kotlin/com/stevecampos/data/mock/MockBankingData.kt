@@ -3,8 +3,8 @@ package com.stevecampos.data.mock
 import com.stevecampos.domain.model.Account
 import com.stevecampos.domain.model.Movement
 import com.stevecampos.domain.model.MovementType
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 
 object MockBankingData {
@@ -56,14 +56,18 @@ object MockBankingData {
             title = "Plin",
             description = "",
             amount = 10.00,
-            date = formatDate(LocalDate.now().minusDays(10)),
+            date = formatDate(daysAgo = 10),
             type = MovementType.DEBIT,
         ),
     )
 
-    private fun formatDate(date: LocalDate): String {
-        val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale("es", "PE"))
-        return date.format(formatter).replaceFirstChar { char ->
+    private fun formatDate(daysAgo: Int): String {
+        val locale = Locale.forLanguageTag("es-PE")
+        val calendar = Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_YEAR, -daysAgo)
+        }
+        val formatter = SimpleDateFormat("dd MMM yyyy", locale)
+        return formatter.format(calendar.time).replaceFirstChar { char ->
             char.uppercase()
         }
     }

@@ -8,6 +8,7 @@ import com.stevecampos.core.ui.theme.BankingAppTheme
 import com.stevecampos.domain.model.Account
 import com.stevecampos.domain.model.Movement
 import com.stevecampos.domain.model.MovementType
+import com.stevecampos.feature.accountdetail.R
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailContentState
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailState
 import kotlinx.coroutines.flow.emptyFlow
@@ -61,7 +62,7 @@ class AccountDetailScreenTest {
         setAccountDetailContent(
             state = AccountDetailState(
                 contentState = AccountDetailContentState.Error(
-                    "No se pudieron obtener los movimientos",
+                    R.string.account_detail_error_movements,
                 ),
             ),
         )
