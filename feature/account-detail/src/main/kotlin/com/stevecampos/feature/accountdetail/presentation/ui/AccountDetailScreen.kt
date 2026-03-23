@@ -20,13 +20,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.stevecampos.core.ui.component.DebugBehaviorRow
-import com.stevecampos.core.ui.component.DebugControlsCard
 import com.stevecampos.core.ui.component.FullscreenLoading
 import com.stevecampos.core.ui.theme.BankingAppTheme
 import com.stevecampos.core.ui.util.formatCurrency
 import com.stevecampos.domain.model.Account
-import com.stevecampos.domain.model.MockBehavior
 import com.stevecampos.domain.model.Movement
 import com.stevecampos.domain.model.MovementType
 import com.stevecampos.feature.accountdetail.presentation.contract.AccountDetailContentState
@@ -141,23 +138,6 @@ private fun AccountDetailContent(
             }
         }
 
-        item {
-            DebugControlsCard(
-                title = "Debug mocks",
-                modifier = Modifier.testTag("account_detail_debug_controls"),
-            ) {
-                DebugBehaviorRow(
-                    label = "Obtener movimientos",
-                    selectedValue = state.getMovementsBehavior.label,
-                    onSuccessSelected = {
-                        onIntent(AccountDetailIntent.OnGetMovementsBehaviorChanged(MockBehavior.SUCCESS))
-                    },
-                    onErrorSelected = {
-                        onIntent(AccountDetailIntent.OnGetMovementsBehaviorChanged(MockBehavior.ERROR))
-                    },
-                )
-            }
-        }
     }
 }
 
@@ -229,11 +209,13 @@ private fun MovementRow(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
-            Text(
-                text = movement.description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            if (movement.description.isNotBlank()) {
+                Text(
+                    text = movement.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             Text(
                 text = movement.date,
                 style = MaterialTheme.typography.labelMedium,
@@ -294,10 +276,12 @@ private fun movementAmount(
     currency: String,
 ): String {
     val prefix = if (movement.type == MovementType.CREDIT) "+" else "-"
-    return prefix + formatCurrency(
+    val formattedAmount = formatCurrency(
         amount = movement.amount,
         currency = currency,
     )
+    val numericAmount = formattedAmount.removePrefix("$currency ")
+    return "$currency $prefix $numericAmount"
 }
 
 @Preview(showBackground = true)
@@ -317,10 +301,10 @@ private fun AccountDetailScreenPreview() {
                     movements = listOf(
                         Movement(
                             id = "m001",
-                            title = "Abono de nomina",
-                            description = "Deposito recibido",
-                            amount = 3500.00,
-                            date = "23 Mar 2026",
+                            title = "Transferencia",
+                            description = "",
+                            amount = 6.10,
+                            date = "Hoy",
                             type = MovementType.CREDIT,
                         ),
                     ),

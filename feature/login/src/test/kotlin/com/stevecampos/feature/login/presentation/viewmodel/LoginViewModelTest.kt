@@ -2,22 +2,15 @@ package com.stevecampos.feature.login.presentation.viewmodel
 
 import app.cash.turbine.test
 import com.stevecampos.domain.model.AuthSession
-import com.stevecampos.domain.model.DebugOperation
 import com.stevecampos.domain.model.DomainException
-import com.stevecampos.domain.model.MockBehavior
 import com.stevecampos.domain.model.SessionState
 import com.stevecampos.domain.repository.AuthRepository
-import com.stevecampos.domain.repository.DebugScenarioRepository
 import com.stevecampos.domain.repository.SessionRepository
 import com.stevecampos.domain.usecase.LoginUseCase
-import com.stevecampos.domain.usecase.ObserveDebugScenariosUseCase
-import com.stevecampos.domain.usecase.UpdateDebugScenarioUseCase
 import com.stevecampos.feature.login.presentation.contract.LoginEffect
 import com.stevecampos.feature.login.presentation.contract.LoginIntent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
@@ -37,18 +30,14 @@ class LoginViewModelTest {
 
     private lateinit var authRepository: FakeAuthRepository
     private lateinit var sessionRepository: FakeSessionRepository
-    private lateinit var debugScenarioRepository: FakeDebugScenarioRepository
     private lateinit var sut: LoginViewModel
 
     @Before
     fun setup() {
         authRepository = FakeAuthRepository()
         sessionRepository = FakeSessionRepository()
-        debugScenarioRepository = FakeDebugScenarioRepository()
         sut = LoginViewModel(
             loginUseCase = LoginUseCase(authRepository, sessionRepository),
-            observeDebugScenariosUseCase = ObserveDebugScenariosUseCase(debugScenarioRepository),
-            updateDebugScenarioUseCase = UpdateDebugScenarioUseCase(debugScenarioRepository),
             ioDispatcher = mainDispatcherRule.dispatcher,
         )
     }
@@ -182,20 +171,5 @@ class LoginViewModelTest {
         override suspend fun getSessionState(): SessionState = SessionState(session = savedSession)
 
         override suspend fun getActiveSession(): AuthSession? = savedSession
-    }
-
-    private class FakeDebugScenarioRepository : DebugScenarioRepository {
-        private val mutableScenarios = MutableStateFlow(
-            DebugOperation.entries.associateWith { MockBehavior.SUCCESS },
-        )
-
-        override val scenarios: StateFlow<Map<DebugOperation, MockBehavior>> = mutableScenarios
-
-        override suspend fun updateBehavior(
-            operation: DebugOperation,
-            behavior: MockBehavior,
-        ) {
-            mutableScenarios.value = mutableScenarios.value + (operation to behavior)
-        }
     }
 }

@@ -33,11 +33,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.stevecampos.core.ui.component.DebugBehaviorRow
-import com.stevecampos.core.ui.component.DebugControlsCard
 import com.stevecampos.core.ui.component.FullscreenLoading
 import com.stevecampos.core.ui.theme.BankingAppTheme
-import com.stevecampos.domain.model.MockBehavior
 import com.stevecampos.feature.login.presentation.contract.LoginEffect
 import com.stevecampos.feature.login.presentation.contract.LoginIntent
 import com.stevecampos.feature.login.presentation.contract.LoginState
@@ -50,8 +47,8 @@ fun LoginScreen(
     effect: Flow<LoginEffect>,
     onIntent: (LoginIntent) -> Unit,
     onNavigation: (LoginEffect.Navigation) -> Unit,
-    appName: String? = null,
     modifier: Modifier = Modifier,
+    appName: String? = null,
 ) {
     val context = LocalContext.current
     val resolvedAppName = appName ?: remember(context) {
@@ -160,19 +157,6 @@ fun LoginScreen(
             // Reservado para volver a mostrar referencias de usuarios mock si el challenge lo requiere.
             // Spacer(modifier = Modifier.height(24.dp))
             // MockUsersReference()
-            Spacer(modifier = Modifier.height(24.dp))
-            DebugControlsCard(title = "Debug mocks") {
-                DebugBehaviorRow(
-                    label = "Login",
-                    selectedValue = state.debugLoginBehavior.label,
-                    onSuccessSelected = {
-                        onIntent(LoginIntent.OnDebugBehaviorChanged(MockBehavior.SUCCESS))
-                    },
-                    onErrorSelected = {
-                        onIntent(LoginIntent.OnDebugBehaviorChanged(MockBehavior.ERROR))
-                    },
-                )
-            }
         }
 
         if (state.isLoading) {
